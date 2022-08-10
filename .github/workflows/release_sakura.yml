@@ -5,7 +5,7 @@ on:
       - '**'
 
     tags:
-      - 'Sakura-v*'
+      - 'v*'
 jobs:
   build-sakura-cli:
     strategy:
