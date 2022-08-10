@@ -38,8 +38,8 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            sakura/target/
-          key: sakura-cli-test-${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('sakura/Cargo.lock') }}
+            target/
+          key: sakura-cli-test-${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             sakura-cli-test-${{ runner.os }}-cargo-${{ matrix.target }}-
 
@@ -47,9 +47,9 @@ jobs:
         with:
           use-cross: true
           command: build
-          args: --verbose --target ${{ matrix.target }} --release --manifest-path sakura/Cargo.toml
+          args: --verbose --target ${{ matrix.target }} --release
 
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.target }}-test-build
-          path: sakura/target/${{ matrix.target }}/release/sakura
+          path: target/${{ matrix.target }}/release/sakura

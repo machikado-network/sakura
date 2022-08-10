@@ -21,7 +21,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('sakura/Cargo.lock') }}
+          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
 
       - name: Build workspace
@@ -45,12 +45,11 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            sakura/target/
-          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('sakura/Cargo.lock') }}
+            target/
+          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
 
       - name: fmt
-        working-directory: sakura
         run: cargo fmt --all -- --check
 
   clippy:
@@ -68,12 +67,11 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            sakura/target/
-          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('sakura/Cargo.lock') }}
+            target/
+          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
 
       - name: Run Clippy
-        working-directory: sakura
         run: cargo clippy --all-targets --all-features -- -D warnings
 
   test:
@@ -91,10 +89,9 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            sakura/target/
-          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('sakura/Cargo.lock') }}
+            target/
+          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
 
       - name: Test
-        working-directory: sakura
         run: cargo test --all -- --nocapture
