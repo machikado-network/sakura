@@ -1,0 +1,29 @@
+[package]
+name = "sakura"
+version = "0.3.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+colored = "2"
+regex = "1.6.0"
+
+[dependencies.clap]
+version = "3.2.16"
+features = ["derive"]
+
+[dependencies.reqwest]
+version = "0.11.11"
+default-features = false
+features = ["blocking", "json", "rustls-tls"]
+
+[dependencies.serde]
+version = "1.0.142"
+features = ["derive"]
+
+[profile.release]
+strip = true
+opt-level = "s"
+lto = true
+codegen-units = 1
