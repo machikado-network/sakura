@@ -35,28 +35,16 @@ jobs:
           target: ${{ matrix.target }}
           override: true
 
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            sakura/target/
-          key: sakura-cli-${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('sakura/Cargo.lock') }}
-          restore-keys: |
-            sakura-cli-${{ runner.os }}-cargo-${{ matrix.target }}-
-
       - uses: actions-rs/cargo@v1
         with:
           use-cross: true
           command: build
-          args: --verbose --target ${{ matrix.target }} --release --manifest-path sakura/Cargo.toml
+          args: --verbose --target ${{ matrix.target }} --release
 
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.tag.outputs.name }}-${{ matrix.target }}
-          path: sakura/target/${{ matrix.target }}/release/sakura
+          path: target/${{ matrix.target }}/release/sakura
 
   draft-release-sakura-cli:
     needs: [build-sakura-cli]
