@@ -25,7 +25,6 @@ jobs:
           restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
 
       - name: Build workspace
-        working-directory: sakura
         run: |
           cargo build
   fmt:
