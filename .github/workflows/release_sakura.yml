@@ -1,0 +1,112 @@
+name: Release sakura CLI
+on:
+  push:
+    branches-ignore:
+      - '**'
+
+    tags:
+      - 'Sakura-v*'
+jobs:
+  build-sakura-cli:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, armv7-unknown-linux-gnueabihf]
+        include:
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: armv7-unknown-linux-gnueabihf
+            os: ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get the tag
+        id: tag
+        run: echo ::set-output name=name::${GITHUB_REF/refs\/tags\//}
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          target: ${{ matrix.target }}
+          override: true
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            sakura/target/
+          key: sakura-cli-${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('sakura/Cargo.lock') }}
+          restore-keys: |
+            sakura-cli-${{ runner.os }}-cargo-${{ matrix.target }}-
+
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --verbose --target ${{ matrix.target }} --release --manifest-path sakura/Cargo.toml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.tag.outputs.name }}-${{ matrix.target }}
+          path: sakura/target/${{ matrix.target }}/release/sakura
+
+  draft-release-sakura-cli:
+    needs: [build-sakura-cli]
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.draft-release.outputs.upload_url }}
+    steps:
+      - name: Get the tag
+        id: tag
+        run: echo ::set-output name=name::${GITHUB_REF/refs\/tags\//}
+
+      - name: Create a draft release
+        id: draft-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          release_name: ${{ steps.tag.outputs.name }}
+          body: |
+            ## Changelog
+          draft: true
+          prerelease: false
+
+  upload-artifacts:
+    strategy:
+      matrix:
+        target: [aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, armv7-unknown-linux-gnueabihf]
+    needs: [ build-sakura-cli, draft-release-sakura-cli ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get the tag
+        id: tag
+        run: echo ::set-output name=name::${GITHUB_REF/refs\/tags\//}
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: ${{ steps.tag.outputs.name }}-${{ matrix.target }}
+
+      - name: Show Files
+        run: ls -R
+
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.draft-release-sakura-cli.outputs.upload_url }}
+          asset_path: ./${{ steps.tag.outputs.name }}-${{ matrix.target }}/sakura
+          asset_name: ${{ steps.tag.outputs.name }}-${{ matrix.target }}
+          asset_content_type: application/octet-stream

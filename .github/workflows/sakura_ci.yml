@@ -1,0 +1,100 @@
+name: Sakura CLI CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('sakura/Cargo.lock') }}
+          restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
+
+      - name: Build workspace
+        working-directory: sakura
+        run: |
+          cargo build
+  fmt:
+    runs-on: ubuntu-latest
+
+    needs: build_cache
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: rustup component add rustfmt
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            sakura/target/
+          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('sakura/Cargo.lock') }}
+          restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
+
+      - name: fmt
+        working-directory: sakura
+        run: cargo fmt --all -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    needs: build_cache
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: rustup component add clippy
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            sakura/target/
+          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('sakura/Cargo.lock') }}
+          restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
+
+      - name: Run Clippy
+        working-directory: sakura
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  test:
+    runs-on: ubuntu-latest
+
+    needs: build_cache
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            sakura/target/
+          key: sakura-cli-ci-${{ runner.os }}-cargo-${{ hashFiles('sakura/Cargo.lock') }}
+          restore-keys: sakura-cli-ci-${{ runner.os }}-cargo-
+
+      - name: Test
+        working-directory: sakura
+        run: cargo test --all -- --nocapture

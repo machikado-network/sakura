@@ -1,0 +1,55 @@
+name: Release sakura CLI Test
+on:
+  workflow_dispatch:
+
+jobs:
+  build-sakura-cli-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, armv7-unknown-linux-gnueabihf]
+        include:
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: armv7-unknown-linux-gnueabihf
+            os: ubuntu-latest
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Set OpenSSL DIR
+        if: runner.os == 'Linux'
+        run: export OPENSSL_DIR="/usr/bin/openssl"
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            sakura/target/
+          key: sakura-cli-test-${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('sakura/Cargo.lock') }}
+          restore-keys: |
+            sakura-cli-test-${{ runner.os }}-cargo-${{ matrix.target }}-
+
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --verbose --target ${{ matrix.target }} --release --manifest-path sakura/Cargo.toml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.target }}-test-build
+          path: sakura/target/${{ matrix.target }}/release/sakura
