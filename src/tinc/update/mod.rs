@@ -6,7 +6,7 @@ use std::io::Write;
 use std::thread::sleep;
 use std::time::Duration;
 
-const STORE_ADDRESS: &str = "0xc30f75fc75a381722fb493502fe292c19e3b84d7427ea13886ac642c62b3bdeb";
+const STORE_ADDRESS: &str = "0x34eee539739466f8ce4d005bcfb59271824e139f130681849490836482dd1e84";
 
 pub fn update_nodes(loop_sec: u64, no_restart: bool) {
     if loop_sec != 0 {

@@ -4,7 +4,7 @@ use colored::Colorize;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-const TESTNET_URL: &str = "https://fullnode.devnet.aptoslabs.com";
+const TESTNET_URL: &str = "https://fullnode.devnet.aptoslabs.com/v1";
 
 #[derive(Deserialize)]
 pub struct AccountsData {
