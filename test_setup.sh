@@ -24,12 +24,11 @@ echo_red() {
 tmp="$(mktemp -d)"
 echo "tmp created at: ${tmp}" >&2
 
-docker build -t "${docker_name}" . &&
-docker run -d --privileged -v "${tmp}":/etc/tinc --name="${docker_name}" "${docker_name}" &&
+docker build --no-cache -t "${docker_name}" . &&
+docker run --rm -d --privileged -v "${tmp}":/etc/tinc --name="${docker_name}" "${docker_name}" &&
 sleep 1 &&
 docker exec "${docker_name}" sakura tinc setup "${tinc_node_name}" 10.50.255.1 &&
-docker stop "${docker_name}" &&
-docker rm "${docker_name}"
+docker stop "${docker_name}"
 
 if ! test -f "${tmp}"/mchkd/hosts/"${tinc_node_name}"; then
   {
