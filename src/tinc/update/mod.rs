@@ -2,12 +2,13 @@ use crate::aptos;
 use crate::utils::run_command_and_wait;
 use colored::Colorize;
 use regex::Regex;
+use std::env;
 use std::io::Write;
 use std::thread::sleep;
 use std::time::Duration;
-use std::env;
 
-const DEFAULT_STORE_ADDRESS: &str = "0x34eee539739466f8ce4d005bcfb59271824e139f130681849490836482dd1e84";
+const DEFAULT_STORE_ADDRESS: &str =
+    "0x34eee539739466f8ce4d005bcfb59271824e139f130681849490836482dd1e84";
 
 pub fn update_nodes(loop_sec: u64, no_restart: bool) {
     if loop_sec != 0 {
@@ -22,7 +23,8 @@ pub fn update_nodes(loop_sec: u64, no_restart: bool) {
 }
 
 pub fn direct_update_nodes(no_restart: bool) {
-    let _store_address = env::var("STORE_ADDRESS").unwrap_or_else(|_| DEFAULT_STORE_ADDRESS.to_string());
+    let _store_address =
+        env::var("STORE_ADDRESS").unwrap_or_else(|_| DEFAULT_STORE_ADDRESS.to_string());
     let store_address = _store_address.as_str();
     let store = aptos::account_resource(
         store_address.to_string(),
