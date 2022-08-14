@@ -32,6 +32,18 @@ docker exec -it sakura_syamimomo_debug sakura tinc setup syamimomo 10.50.255.1
 docker exec -it sakura_syamimomo_debug sakura tinc update
 ```
 
+**正しいSTORE_ADDRESSで sakura tinc update を実行する**
+
+```sh
+docker exec -it -e STORE_ADDRESS="0x34eee539739466f8ce4d005bcfb59271824e139f130681849490836482dd1e84" sakura_syamimomo_debug sakura tinc update
+```
+
+**誤ったSTORE_ADDRESSで sakura tinc update を実行する**
+
+```sh
+docker exec -it -e STORE_ADDRESS="0x34eee539739466f8ce4d005bcfb59271824e139f130681849490836482dd1e85" sakura_syamimomo_debug sakura tinc update
+```
+
 **コンテナでシェルを実行する**
 
 ```sh
