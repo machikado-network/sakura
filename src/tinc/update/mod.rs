@@ -22,10 +22,7 @@ pub fn update_nodes(loop_sec: u64, no_restart: bool) {
 }
 
 pub fn direct_update_nodes(no_restart: bool) {
-    let _store_address = match env::var("STORE_ADDRESS") {
-        Ok(val) => val,
-        Err(_) => DEFAULT_STORE_ADDRESS.to_string(),
-    };
+    let _store_address = env::var("STORE_ADDRESS").unwrap_or_else(|_| DEFAULT_STORE_ADDRESS.to_string());
     let store_address = _store_address.as_str();
     let store = aptos::account_resource(
         store_address.to_string(),
