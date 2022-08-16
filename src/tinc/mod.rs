@@ -15,6 +15,9 @@ pub enum TincCommand {
         name: String,
         #[clap(value_parser = validate_ip_addr)]
         ip_addr: Ipv4Addr,
+        /// まちカドネットワークがTincで利用するネットワークブリッジインターフェース名。
+        #[clap(short, long, default_value = "br0")]
+        interface: String,
     },
     Update {
         /// If the value is set to 1 or more, it runs as a daemon.
@@ -28,7 +31,11 @@ pub enum TincCommand {
 
 pub fn run_tinc_command(command: TincCommand) {
     match command {
-        TincCommand::Setup { name, ip_addr } => setup_tinc(name, ip_addr),
+        TincCommand::Setup {
+            name,
+            ip_addr,
+            interface,
+        } => setup_tinc(name, ip_addr, interface),
         TincCommand::Update {
             loop_sec,
             no_restart,
