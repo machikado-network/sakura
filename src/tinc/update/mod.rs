@@ -2,11 +2,13 @@ use crate::aptos;
 use crate::utils::run_command_and_wait;
 use colored::Colorize;
 use regex::Regex;
+use std::env;
 use std::io::Write;
 use std::thread::sleep;
 use std::time::Duration;
 
-const STORE_ADDRESS: &str = "0x34eee539739466f8ce4d005bcfb59271824e139f130681849490836482dd1e84";
+const DEFAULT_STORE_ADDRESS: &str =
+    "0x34eee539739466f8ce4d005bcfb59271824e139f130681849490836482dd1e84";
 
 pub fn update_nodes(loop_sec: u64, no_restart: bool) {
     if loop_sec != 0 {
@@ -21,9 +23,11 @@ pub fn update_nodes(loop_sec: u64, no_restart: bool) {
 }
 
 pub fn direct_update_nodes(no_restart: bool) {
+    let store_address =
+        env::var("STORE_ADDRESS").unwrap_or_else(|_| DEFAULT_STORE_ADDRESS.to_string());
     let store = aptos::account_resource(
-        STORE_ADDRESS.to_string(),
-        format!("{}::MachikadoAccount::AccountStore", STORE_ADDRESS),
+        store_address.clone(),
+        format!("{}::MachikadoAccount::AccountStore", store_address),
     );
     let aptos::ResourceData {
         accounts,
@@ -58,8 +62,8 @@ pub fn direct_update_nodes(no_restart: bool) {
         };
         let account: aptos::machikado::MachikadoAccount = aptos::table_items(
             accounts.handle.clone(),
-            format!("{}::MachikadoAccount::AccountKey", STORE_ADDRESS),
-            format!("{}::MachikadoAccount::Account", STORE_ADDRESS),
+            format!("{}::MachikadoAccount::AccountKey", store_address),
+            format!("{}::MachikadoAccount::Account", store_address),
             key,
         );
         for node in account.nodes {
