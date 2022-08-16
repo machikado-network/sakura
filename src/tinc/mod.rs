@@ -31,7 +31,11 @@ pub enum TincCommand {
 
 pub fn run_tinc_command(command: TincCommand) {
     match command {
-        TincCommand::Setup { name, ip_addr, interface } => setup_tinc(name, ip_addr, interface),
+        TincCommand::Setup {
+            name,
+            ip_addr,
+            interface,
+        } => setup_tinc(name, ip_addr, interface),
         TincCommand::Update {
             loop_sec,
             no_restart,

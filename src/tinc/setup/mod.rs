@@ -100,13 +100,21 @@ pub fn validate_ip_addr(s: &str) -> Result<Ipv4Addr, String> {
 }
 
 fn check_interface_used(interface: String) {
-    println!("    {} bridge interface {} is used", info!("Checking"), info!(interface));
+    println!(
+        "    {} bridge interface {} is used",
+        info!("Checking"),
+        info!(interface)
+    );
     let output = Command::new("ip")
         .args(&["link", "show", interface.as_str()])
         .output()
         .expect(&*format!("Failed to run `ip link show {}`", interface));
     if output.status.success() {
-        println!("    {} bridge interface {}. abort.", error!("Found"), info!(interface));
+        println!(
+            "    {} bridge interface {}. abort.",
+            error!("Found"),
+            info!(interface)
+        );
         exit(1);
     }
     println!("    Bridge interface not found!");
@@ -172,7 +180,12 @@ fn get_public_key(name: String) -> String {
 fn create_tinc_down(interface: String) {
     println!("    {} /etc/tinc/mchkd/tinc-down", info!("Creating"));
     let mut file = fs::File::create("/etc/tinc/mchkd/tinc-down").unwrap();
-    file.write_all(TINC_DOWN.replace("{interface}", interface.as_str()).as_bytes()).unwrap();
+    file.write_all(
+        TINC_DOWN
+            .replace("{interface}", interface.as_str())
+            .as_bytes(),
+    )
+    .unwrap();
 
     println!(
         "    {} `chmod +x /etc/tinc/mchkd/tinc-down`",
@@ -184,7 +197,12 @@ fn create_tinc_down(interface: String) {
 fn create_nat_iptables(interface: String) {
     println!("    {} /etc/tinc/mchkd/nat.iptables", info!("Creating"),);
     let mut file = fs::File::create("/etc/tinc/mchkd/nat.iptables").unwrap();
-    file.write_all(NAT_SETTING.replace("{interface}", interface.as_str()).as_bytes()).unwrap();
+    file.write_all(
+        NAT_SETTING
+            .replace("{interface}", interface.as_str())
+            .as_bytes(),
+    )
+    .unwrap();
 }
 
 fn create_tinc_up(ip_addr: Ipv4Addr, interface: String) {
