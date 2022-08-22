@@ -142,7 +142,10 @@ pub fn direct_update_nodes(no_restart: bool) {
 
 #[cfg(test)]
 mod tests {
+    use std::env;
     use regex::Regex;
+    use crate::aptos;
+    use crate::tinc::update::DEFAULT_STORE_ADDRESS;
 
     #[test]
     fn test_regex() {
@@ -155,5 +158,15 @@ mod tests {
             .expect("Failed to find name from tinc.conf")
             .as_str();
         assert_eq!(name, "syamimomo")
+    }
+
+    #[test]
+    fn test_account_resource() {
+        let store_address =
+            env::var("STORE_ADDRESS").unwrap_or_else(|_| DEFAULT_STORE_ADDRESS.to_string());
+        let store = aptos::account_resource(
+            store_address.clone(),
+            format!("{}::MachikadoAccount::AccountStore", store_address),
+        );
     }
 }
