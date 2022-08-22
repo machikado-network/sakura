@@ -8,7 +8,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 const DEFAULT_STORE_ADDRESS: &str =
-    "0x34eee539739466f8ce4d005bcfb59271824e139f130681849490836482dd1e84";
+    "0x453eb7d4a2d829f0a5e96e4f3cf041ccface34143ba5a28b7286836c4484b763";
 
 pub fn update_nodes(loop_sec: u64, no_restart: bool) {
     if loop_sec != 0 {
