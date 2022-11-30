@@ -289,13 +289,13 @@ fn install_tinc() {
         });
     #[cfg(target_os = "linux")]
     let r = Command::new("apt-get")
-        .args(["install", "tinc", "iptables", "-y"])
+        .args(&["install", "tinc", "iptables", "-y"])
         .spawn()
-        .expect(&format!(
-            "{} {}",
-            "Failed".bright_red().bold(),
-            "to run `brew install tinc`"
-        ));
+        .unwrap_or_else(|_| {
+            panic!("{} {}",
+                   "Failed".bright_red().bold(),
+                   "to run `brew install tinc`")
+        });
 
     let output = r.wait_with_output();
     if output.is_err() || !output.unwrap().status.success() {
