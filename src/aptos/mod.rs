@@ -39,11 +39,11 @@ pub fn account_resource(
         addr,
         resource_type
     ))
-    .unwrap_or_else(|_| {panic!("{}", "Failed to get resources".bright_red().bold())});
+    .unwrap_or_else(|_| panic!("{}", "Failed to get resources".bright_red().bold()));
 
     response
         .json::<AccountStoreResource>()
-        .unwrap_or_else(|_| {panic!("{}", "Failed to get resources".bright_red().bold())})
+        .unwrap_or_else(|_| panic!("{}", "Failed to get resources".bright_red().bold()))
 }
 
 #[derive(Serialize)]
@@ -78,9 +78,9 @@ where
         ))
         .json(&body)
         .send()
-        .unwrap_or_else(|_| {panic!("{}", "Failed to get resource".bright_red().bold())});
+        .unwrap_or_else(|_| panic!("{}", "Failed to get resource".bright_red().bold()));
 
     response
         .json::<R>()
-        .unwrap_or_else(|_| {panic!("{}", "Failed to get resource".bright_red().bold())})
+        .unwrap_or_else(|_| panic!("{}", "Failed to get resource".bright_red().bold()))
 }

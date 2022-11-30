@@ -108,7 +108,7 @@ fn check_interface_used(interface: String) {
     let output = Command::new("ip")
         .args(["link", "show", interface.as_str()])
         .output()
-        .unwrap_or_else(|_| {panic!("Failed to run `ip link show {}`", interface)});
+        .unwrap_or_else(|_| panic!("Failed to run `ip link show {}`", interface));
     if output.status.success() {
         println!(
             "    {} bridge interface {}. abort.",
@@ -280,15 +280,18 @@ fn install_tinc() {
     let r = Command::new("brew")
         .args(["install", "tinc"])
         .spawn()
-        .unwrap_or_else(|_| {panic!(
-            "{} {}",
-            "Failed".bright_red().bold(),
-            "to run `brew install tinc`")});
+        .unwrap_or_else(|_| {
+            panic!(
+                "{} {}",
+                "Failed".bright_red().bold(),
+                "to run `brew install tinc`"
+            )
+        });
     #[cfg(target_os = "linux")]
     let r = Command::new("apt-get")
-        .args(&["install", "tinc", "iptables", "-y"])
+        .args(["install", "tinc", "iptables", "-y"])
         .spawn()
-        .expect(&*format!(
+        .expect(&format!(
             "{} {}",
             "Failed".bright_red().bold(),
             "to run `brew install tinc`"
