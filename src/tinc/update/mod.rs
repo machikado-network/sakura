@@ -41,7 +41,7 @@ pub fn direct_update_nodes(network_id: i32, no_restart: bool) {
     let conf = std::fs::read_to_string("/etc/tinc/mchkd/tinc.conf")
         .expect("Failed to open /etc/tinc/mchkd/tinc.conf");
     let name = name_regex
-        .captures(&*conf)
+        .captures(&conf)
         .expect("Failed to find name from tinc.conf")
         .name("name")
         .expect("Failed to find name from tinc.conf")
@@ -139,7 +139,7 @@ pub fn direct_update_nodes(network_id: i32, no_restart: bool) {
         return;
     }
     println!("{} tinc", "Restarting".bright_cyan().bold());
-    run_command_and_wait("systemctl", &["restart", "tinc@mchkd.service"]);
+    run_command_and_wait("systemctl", ["restart", "tinc@mchkd.service"]);
 }
 
 #[cfg(test)]

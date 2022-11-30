@@ -106,9 +106,9 @@ fn check_interface_used(interface: String) {
         info!(interface)
     );
     let output = Command::new("ip")
-        .args(&["link", "show", interface.as_str()])
+        .args(["link", "show", interface.as_str()])
         .output()
-        .expect(&*format!("Failed to run `ip link show {}`", interface));
+        .unwrap_or_else(|_| {panic!("Failed to run `ip link show {}`", interface)});
     if output.status.success() {
         println!(
             "    {} bridge interface {}. abort.",
@@ -152,19 +152,19 @@ pub fn setup_tinc(name: String, ip_addr: Ipv4Addr, interface: String) {
     println!();
     println!("    {} RSA Key Pair", info!("Generating"));
     let output = Command::new("tincd")
-        .args(&["-K", "-n", "mchkd"])
+        .args(["-K", "-n", "mchkd"])
         .output()
         .expect("Failed to run `which tincd`");
     println!("{}", String::from_utf8_lossy(&output.stdout));
     println!("    {} debug log setting", info!("Changing"));
     run_command_and_wait(
         "sed",
-        &["-i", "-e", "/^# EXTRA=\"-d\"$/ s/# //", "/etc/default/tinc"],
+        ["-i", "-e", "/^# EXTRA=\"-d\"$/ s/# //", "/etc/default/tinc"],
     );
     println!("    {} service tinc@mchkd.service", info!("Enable"));
-    run_command_and_wait("systemctl", &["enable", "tinc@mchkd.service"]);
+    run_command_and_wait("systemctl", ["enable", "tinc@mchkd.service"]);
     println!("    {} service tinc@mchkd.service", info!("Starting"));
-    run_command_and_wait("systemctl", &["start", "tinc@mchkd.service"]);
+    run_command_and_wait("systemctl", ["start", "tinc@mchkd.service"]);
     println!();
     println!("{}", "==== Setup Completed! ====".bright_cyan().bold());
     println!(
@@ -191,7 +191,7 @@ fn create_tinc_down(interface: String) {
         "    {} `chmod +x /etc/tinc/mchkd/tinc-down`",
         info!("Running")
     );
-    run_command_and_wait("chmod", &["+x", "/etc/tinc/mchkd/tinc-down"]);
+    run_command_and_wait("chmod", ["+x", "/etc/tinc/mchkd/tinc-down"]);
 }
 
 fn create_nat_iptables(interface: String) {
@@ -226,7 +226,7 @@ fn create_tinc_up(ip_addr: Ipv4Addr, interface: String) {
         "    {} `chmod +x /etc/tinc/mchkd/tinc-up`",
         info!("Running")
     );
-    run_command_and_wait("chmod", &["+x", "/etc/tinc/mchkd/tinc-up"]);
+    run_command_and_wait("chmod", ["+x", "/etc/tinc/mchkd/tinc-up"]);
 }
 
 fn create_tinc_conf(name: String) {
@@ -252,12 +252,12 @@ fn create_directories() {
         "    {} `mkdir /etc/tinc/mchkd /etc/tinc/mchkd/hosts`",
         info!("Running")
     );
-    run_command_and_wait("mkdir", &["/etc/tinc/mchkd", "/etc/tinc/mchkd/hosts"])
+    run_command_and_wait("mkdir", ["/etc/tinc/mchkd", "/etc/tinc/mchkd/hosts"])
 }
 
 fn check_machikado_network_installed() {
     let output = Command::new("test")
-        .args(&["-d", "/etc/tinc/mchkd"])
+        .args(["-d", "/etc/tinc/mchkd"])
         .output()
         .expect("Failed to run `test -d /etc/tinc/mchkd`");
     if output.status.success() {
@@ -278,13 +278,12 @@ fn install_tinc() {
 
     #[cfg(target_os = "macos")]
     let r = Command::new("brew")
-        .args(&["install", "tinc"])
+        .args(["install", "tinc"])
         .spawn()
-        .expect(&*format!(
+        .unwrap_or_else(|_| {panic!(
             "{} {}",
             "Failed".bright_red().bold(),
-            "to run `brew install tinc`"
-        ));
+            "to run `brew install tinc`")});
     #[cfg(target_os = "linux")]
     let r = Command::new("apt-get")
         .args(&["install", "tinc", "iptables", "-y"])
@@ -304,13 +303,13 @@ fn install_tinc() {
         exit(1);
     }
     let output = Command::new("which")
-        .args(&["tincd"])
+        .args(["tincd"])
         .output()
         .expect("Failed to run `which tincd`");
     println!(
         "    {} tinc to: {}",
         "Installed".bright_green().bold(),
-        String::from_utf8_lossy(&*output.stdout)
+        String::from_utf8_lossy(&output.stdout)
     );
 }
 
