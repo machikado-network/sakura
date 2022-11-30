@@ -8,24 +8,25 @@ use std::thread::sleep;
 use std::time::Duration;
 
 const DEFAULT_STORE_ADDRESS: &str =
-    "0x453eb7d4a2d829f0a5e96e4f3cf041ccface34143ba5a28b7286836c4484b763";
+    "0xfd320e6f9395c747dbf54cadea98426ec63716b6fe97ee0f8ce83eb1dda9d71a";
 
-pub fn update_nodes(loop_sec: u64, no_restart: bool) {
+pub fn update_nodes(network_id: i32, loop_sec: u64, no_restart: bool) {
     if loop_sec != 0 {
         loop {
-            direct_update_nodes(no_restart);
+            direct_update_nodes(network_id, no_restart);
             sleep(Duration::from_secs(loop_sec));
         }
     } else {
         // Only 1
-        direct_update_nodes(no_restart);
+        direct_update_nodes(network_id, no_restart);
     }
 }
 
-pub fn direct_update_nodes(no_restart: bool) {
+pub fn direct_update_nodes(network_id: i32, no_restart: bool) {
     let store_address =
         env::var("STORE_ADDRESS").unwrap_or_else(|_| DEFAULT_STORE_ADDRESS.to_string());
     let store = aptos::account_resource(
+        network_id,
         store_address.clone(),
         format!("{}::MachikadoAccount::AccountStore", store_address),
     );
@@ -61,6 +62,7 @@ pub fn direct_update_nodes(no_restart: bool) {
             owner: address.clone(),
         };
         let account: aptos::machikado::MachikadoAccount = aptos::table_items(
+            network_id,
             accounts.handle.clone(),
             format!("{}::MachikadoAccount::AccountKey", store_address),
             format!("{}::MachikadoAccount::Account", store_address),
@@ -142,10 +144,10 @@ pub fn direct_update_nodes(no_restart: bool) {
 
 #[cfg(test)]
 mod tests {
-    use std::env;
-    use regex::Regex;
     use crate::aptos;
     use crate::tinc::update::DEFAULT_STORE_ADDRESS;
+    use regex::Regex;
+    use std::env;
 
     #[test]
     fn test_regex() {
@@ -164,7 +166,8 @@ mod tests {
     fn test_account_resource() {
         let store_address =
             env::var("STORE_ADDRESS").unwrap_or_else(|_| DEFAULT_STORE_ADDRESS.to_string());
-        let store = aptos::account_resource(
+        let _store = aptos::account_resource(
+            1,
             store_address.clone(),
             format!("{}::MachikadoAccount::AccountStore", store_address),
         );

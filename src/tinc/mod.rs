@@ -20,6 +20,9 @@ pub enum TincCommand {
         interface: String,
     },
     Update {
+        /// データ受信するネットワークid. mainnet = 1, testnet = 2.
+        #[clap(long, short = 'n', default_value_t = 1)]
+        network_id: i32,
         /// If the value is set to 1 or more, it runs as a daemon.
         #[clap(short = 'd', default_value_t = 0)]
         loop_sec: u64,
@@ -39,6 +42,7 @@ pub fn run_tinc_command(command: TincCommand) {
         TincCommand::Update {
             loop_sec,
             no_restart,
-        } => update_nodes(loop_sec, no_restart),
+            network_id,
+        } => update_nodes(network_id, loop_sec, no_restart),
     }
 }
