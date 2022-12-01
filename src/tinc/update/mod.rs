@@ -102,7 +102,7 @@ pub fn direct_update_nodes(network_id: i32, no_restart: bool) {
             }
             content += &*format!(
                 "-----BEGIN RSA PUBLIC KEY-----\n{}\n-----END RSA PUBLIC KEY-----\n",
-                node.public_key
+                from_hex(node.public_key.clone())
                     .as_bytes()
                     .to_vec()
                     .chunks(64)
