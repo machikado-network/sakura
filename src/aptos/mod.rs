@@ -28,6 +28,15 @@ fn get_network_url(id: i32) -> String {
     }
 }
 
+pub fn from_hex(hex_string: String) -> String {
+    hex_string.as_bytes().chunks(2).map(
+        |code| {
+            let point = u32::from_str_radix(String::from_utf8_lossy(code).to_string().as_str(), 16).unwrap();
+            char::from_u32(point).unwrap()
+        }
+    ).map(|x| x.to_string()).collect::<Vec<_>>().join("")
+}
+
 pub fn account_resource(
     network_id: i32,
     addr: String,
@@ -83,4 +92,14 @@ where
     response
         .json::<R>()
         .unwrap_or_else(|_| panic!("{}", "Failed to get resource".bright_red().bold()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::from_hex;
+
+    #[test]
+    fn test_hex() {
+        assert_eq!(from_hex("7379616d696d6f6d6f".to_string()), "syamimomo")
+    }
 }
