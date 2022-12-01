@@ -29,12 +29,17 @@ fn get_network_url(id: i32) -> String {
 }
 
 pub fn from_hex(hex_string: String) -> String {
-    hex_string.as_bytes().chunks(2).map(
-        |code| {
-            let point = u32::from_str_radix(String::from_utf8_lossy(code).to_string().as_str(), 16).unwrap();
+    hex_string
+        .as_bytes()
+        .chunks(2)
+        .map(|code| {
+            let point = u32::from_str_radix(String::from_utf8_lossy(code).to_string().as_str(), 16)
+                .unwrap();
             char::from_u32(point).unwrap()
-        }
-    ).map(|x| x.to_string()).collect::<Vec<_>>().join("")
+        })
+        .map(|x| x.to_string())
+        .collect::<Vec<_>>()
+        .join("")
 }
 
 pub fn account_resource(

@@ -1,4 +1,5 @@
 use crate::aptos;
+use crate::aptos::from_hex;
 use crate::utils::run_command_and_wait;
 use colored::Colorize;
 use regex::Regex;
@@ -6,7 +7,6 @@ use std::env;
 use std::io::Write;
 use std::thread::sleep;
 use std::time::Duration;
-use crate::aptos::from_hex;
 
 const DEFAULT_STORE_ADDRESS: &str =
     "0xfd320e6f9395c747dbf54cadea98426ec63716b6fe97ee0f8ce83eb1dda9d71a";
@@ -71,18 +71,29 @@ pub fn direct_update_nodes(network_id: i32, no_restart: bool) {
         );
         for node in account.nodes {
             sleep(Duration::from_secs(2));
-            println!("{} {} Node", "Setup".bright_cyan().bold(), from_hex(node.name.clone()));
+            println!(
+                "{} {} Node",
+                "Setup".bright_cyan().bold(),
+                from_hex(node.name.clone())
+            );
             let mut content = format!(
                 "# {}\n# account: {}\n# address: {}\n\n",
-                from_hex(node.name.clone()), from_hex(account.name.clone()), address
+                from_hex(node.name.clone()),
+                from_hex(account.name.clone()),
+                address
             );
             if !node.inet_hostname.vec.is_empty() {
-                content += &*format!("Address = {}\n", from_hex(node.inet_hostname.vec.first().unwrap().clone()));
+                content += &*format!(
+                    "Address = {}\n",
+                    from_hex(node.inet_hostname.vec.first().unwrap().clone())
+                );
 
                 // Write ConnectTo = {Name} if node is not myself
                 if name != from_hex(node.name.clone()) {
                     tincconf
-                        .write_all(format!("ConnectTo = {}\n", from_hex(node.name.clone())).as_bytes())
+                        .write_all(
+                            format!("ConnectTo = {}\n", from_hex(node.name.clone())).as_bytes(),
+                        )
                         .expect("Failed to write tinc.conf");
                 }
             }
@@ -104,8 +115,10 @@ pub fn direct_update_nodes(network_id: i32, no_restart: bool) {
                 "Checking".bright_cyan().bold(),
                 from_hex(node.name.clone())
             );
-            let old_content =
-                std::fs::read_to_string(format!("/etc/tinc/mchkd/hosts/{}", from_hex(node.name.clone())));
+            let old_content = std::fs::read_to_string(format!(
+                "/etc/tinc/mchkd/hosts/{}",
+                from_hex(node.name.clone())
+            ));
             if old_content.is_ok() {
                 println!(
                     "{}: /etc/tinc/mchkd/hosts/{} is exists so comparing contents...",
@@ -128,9 +141,15 @@ pub fn direct_update_nodes(network_id: i32, no_restart: bool) {
                 "Writing".bright_cyan().bold(),
                 from_hex(node.name.clone())
             );
-            let _ = std::fs::remove_file(format!("/etc/tinc/mchkd/hosts/{}", from_hex(node.name.clone())));
-            let mut file = std::fs::File::create(format!("/etc/tinc/mchkd/hosts/{}", from_hex(node.name.clone())))
-                .expect("Failed to create file");
+            let _ = std::fs::remove_file(format!(
+                "/etc/tinc/mchkd/hosts/{}",
+                from_hex(node.name.clone())
+            ));
+            let mut file = std::fs::File::create(format!(
+                "/etc/tinc/mchkd/hosts/{}",
+                from_hex(node.name.clone())
+            ))
+            .expect("Failed to create file");
             file.write_all(content.as_bytes())
                 .expect("Failed to write to file");
         }
