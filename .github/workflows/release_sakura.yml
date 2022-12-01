@@ -33,6 +33,9 @@ jobs:
           toolchain: stable
           targets: ${{ matrix.target }}
 
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
       - name: build
         run: |
           cross build --verbose --target ${{ matrix.target }} --release
